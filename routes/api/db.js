@@ -1,24 +1,23 @@
+require("dotenv").config(); // Wczytaj zmienne środowiskowe z pliku .env
+
 const mongoose = require("mongoose");
 
 
-const dbUrl = "mongodb+srv://jaroslawdzwolak:YkP9R73NbIQxZUqy@mynewclaster.flblrxp.mongodb.net/";
-
+const dbUrl = process.env.DB_HOST;
 
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-
 const db = mongoose.connection;
 db.on("connected", () => {
   console.log("Database connection successful");
 });
 
-
 db.on("error", (err) => {
   console.error("Database connection error:", err);
-  process.exit(1); // Zakończ proces w przypadku błędu
+  process.exit(1);
 });
 
 module.exports = db;

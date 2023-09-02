@@ -1,7 +1,7 @@
 const express = require("express");
 const Joi = require("joi");
 const { v4: uuidv4 } = require("uuid");
-const Contact = require("./models/contacts");
+const Contact = require("../../services/contacts");
 
 const router = express.Router();
 
