@@ -1,6 +1,6 @@
-import Contact from "../services/contacts";
+const Contact = require("../services/contacts");
 
-export const listContacts = async () => {
+const listContacts = async () => {
   try {
     return await Contact.find();
   } catch (err) {
@@ -9,7 +9,7 @@ export const listContacts = async () => {
   }
 };
 
-export const getContactById = async (contactId) => {
+const getContactById = async (contactId) => {
   try {
     return await Contact.findOne({ _id: contactId });
   } catch (err) {
@@ -18,7 +18,7 @@ export const getContactById = async (contactId) => {
   }
 };
 
-export const removeContact = async (contactId) => {
+const removeContact = async (contactId) => {
   try {
     return await Contact.findByIdAndRemove({ _id: contactId });
   } catch (err) {
@@ -27,7 +27,7 @@ export const removeContact = async (contactId) => {
   }
 };
 
-export const addContact = async (body) => {
+const addContact = async (body) => {
   try {
     return await Contact.create(body);
   } catch (err) {
@@ -36,7 +36,7 @@ export const addContact = async (body) => {
   }
 };
 
-export const updateContact = async (contactId, body) => {
+const updateContact = async (contactId, body) => {
   try {
     return await Contact.findByIdAndUpdate({ _id: contactId }, body, {
       new: true,
@@ -47,7 +47,7 @@ export const updateContact = async (contactId, body) => {
   }
 };
 
-export const updatedStatusContact = async (contactId, favorite) => {
+const updatedStatusContact = async (contactId, favorite) => {
   try {
     return await Contact.findByIdAndUpdate(
       { _id: contactId },
@@ -58,4 +58,13 @@ export const updatedStatusContact = async (contactId, favorite) => {
     console.error("An error occurred while updating contact: ", err);
     throw err;
   }
+};
+
+module.exports = {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+  updatedStatusContact,
 };

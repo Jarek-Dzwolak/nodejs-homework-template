@@ -1,4 +1,4 @@
-require("dotenv").config(); // Wczytaj zmienne środowiskowe z pliku .env
+require("dotenv").config(); 
 
 const mongoose = require("mongoose");
 
