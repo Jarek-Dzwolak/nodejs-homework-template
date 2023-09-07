@@ -19,7 +19,7 @@ passport.use(
       try {
         const user = await User.findById(jwtPayload.id);
 
-        if (!user || user.token !== jwtPayload.token) {
+        if (!user) {
           return done(null, false, { message: "Not authorized" });
         }
 

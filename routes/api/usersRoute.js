@@ -115,7 +115,10 @@ router.post("/logout", auth, async (req, res) => {
     user.token = null;
     await user.save();
 
-    res.status(204).json();
+    res.status(204).json({
+      message: "Logout is done",
+    });
+    return;
   } catch (error) {
     res.status(500).json({
       status: "error",
