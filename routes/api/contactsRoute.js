@@ -1,6 +1,5 @@
 const express = require("express");
-const Joi = require("joi");
-const { v4: uuidv4 } = require("uuid");
+
 const {
   listContacts,
   getContactById,
@@ -72,6 +71,7 @@ router.delete("/:id", async (req, res, next) => {
 
     return res.status(200).json({
       message: `Contact with ID ${id} has been successfully removed.`,
+      data: { isContactRemoved },
     });
   } catch (err) {
     res
