@@ -17,8 +17,8 @@ passport.use(
     },
     async (jwtPayload, done) => {
       try {
-        const user = await User.findById(jwtPayload.id);
-
+        const user = await User.findById(jwtPayload.id).select("-password");
+        console.log(user);
         if (!user) {
           return done(null, false, { message: "Not authorized" });
         }
