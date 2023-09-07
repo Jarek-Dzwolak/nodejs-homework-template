@@ -1,9 +1,9 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-
+const passport = require("passport");
 const contactsRouter = require("./routes/api/contactsRoute");
-
+const usersRouter = require("./routes/api/usersRoute");
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
@@ -17,6 +17,8 @@ app.use("/api/contacts", contactsRouter);
 app.get("/", (req, res) => {
   res.send("Welcome to the Contact API");
 });
+app.use("/api/users", usersRouter);
+app.use(passport.initialize());
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
