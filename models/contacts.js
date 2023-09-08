@@ -2,7 +2,7 @@ const Contact = require("../services/contacts");
 
 const listContacts = async () => {
   try {
-    return await Contact.find();
+    return await Contact.find({ owner: userId });
   } catch (err) {
     console.log("Error getting contact list: ", err);
     throw err;
@@ -11,7 +11,7 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   try {
-    return await Contact.findOne({ _id: contactId });
+    return await Contact.findOne({ _id: contactId, owner: userId });
   } catch (err) {
     console.log(`Error getting contact with id ${contactId}: `, err);
     throw err;
@@ -29,7 +29,8 @@ const removeContact = async (contactId) => {
 
 const addContact = async (body) => {
   try {
-    return await Contact.create(body);
+    const contactData = { ...body, owner: userId };
+    return await Contact.create(contactData);
   } catch (err) {
     console.log("Error adding new contact: ", err);
     throw err;

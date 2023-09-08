@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("../../auth");
 
 const {
   listContacts,
@@ -10,9 +11,11 @@ const {
 } = require("../../models/contacts");
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
   try {
-    const contacts = await listContacts();
+    const userId = req.user._id;
+
+    const contacts = await listContacts(userId);
 
     return res.json({
       status: "success",
@@ -26,13 +29,21 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", auth, async (req, res, next) => {
   const { id } = req.params;
-  console.log("this is id: ", id);
+  const { id: userId } = req.user;
   try {
-    const contact = await getContactById(id);
+    const contact = await getContactById(userId, id);
 
-    return res.json({
+    if (!contact) {
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Contact not found",
+      });
+    }
+
+    return res.status(200).json({
       status: "success",
       code: 200,
       data: { contact },
@@ -52,7 +63,7 @@ router.post("/", async (req, res, next) => {
   }
 
   try {
-    const contact = await addContact(body);
+    const contact = await addContact(body, userId);
 
     return res.status(201).json({
       status: "success",
