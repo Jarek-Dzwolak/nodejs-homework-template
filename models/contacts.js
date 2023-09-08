@@ -1,6 +1,6 @@
 const Contact = require("../services/contacts");
 
-const listContacts = async () => {
+const listContacts = async (userId) => {
   try {
     return await Contact.find({ owner: userId });
   } catch (err) {
@@ -27,7 +27,7 @@ const removeContact = async (contactId) => {
   }
 };
 
-const addContact = async (body) => {
+const addContact = async (userId, body) => {
   try {
     const contactData = { ...body, owner: userId };
     return await Contact.create(contactData);
