@@ -53,8 +53,8 @@ router.get("/:id", auth, async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
-  const { body } = req;
+router.post("/", auth, async (req, res, next) => {
+  const { body, user } = req;
 
   if (Object.keys(body).length === 0) {
     return res
@@ -63,7 +63,7 @@ router.post("/", async (req, res, next) => {
   }
 
   try {
-    const contact = await addContact(body, userId);
+    const contact = await addContact(user.id, body);
 
     return res.status(201).json({
       status: "success",
