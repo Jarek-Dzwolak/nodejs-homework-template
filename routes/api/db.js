@@ -1,7 +1,6 @@
-require("dotenv").config(); 
+require("dotenv").config();
 
 const mongoose = require("mongoose");
-
 
 const dbUrl = process.env.DB_HOST;
 
