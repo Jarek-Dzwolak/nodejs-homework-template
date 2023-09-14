@@ -6,8 +6,12 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.SECRET;
+const multer = require("multer");
+const gravatar = require("gravatar");
 const auth = require("../../auth");
 const { getUser } = require("../../models/users");
+const path = require("path");
+
 const signupSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
@@ -30,10 +34,17 @@ router.post("/signup", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
+    const avatarURL = gravatar.url(req.body.email, {
+      s: "200",
+      r: "pg",
+      d: "identicon",
+    });
+    console.log("Generated avatarURL:", avatarURL);
     const user = new User({
       email: req.body.email,
       password: hashedPassword,
       subscription: "starter",
+      avatarURL: avatarURL,
     });
 
     await user.save();
@@ -42,6 +53,7 @@ router.post("/signup", async (req, res) => {
       user: {
         email: user.email,
         subscription: user.subscription,
+        avatarURL: user.avatarURL,
       },
     });
   } catch (error) {
@@ -145,6 +157,28 @@ router.get("/current", auth, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
+});
+
+// //////////////////////////////////////////
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/avatars");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/upload", upload.single("file"), (req, res) => {
+  const { description } = req.body;
+  res.json({
+    description,
+    message: "Plik załadowany pomyślnie",
+    status: 200,
+  });
 });
 
 module.exports = router;
