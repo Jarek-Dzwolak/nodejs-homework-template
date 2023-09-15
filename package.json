@@ -17,6 +17,7 @@
     "fs.promises": "^0.1.2",
     "gravatar": "^1.8.2",
     "http-errors": "^2.0.0",
+    "jimp": "^0.22.10",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
