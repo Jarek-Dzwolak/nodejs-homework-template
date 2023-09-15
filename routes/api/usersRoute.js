@@ -204,9 +204,9 @@ router.patch("/avatars", auth, upload.single("avatar"), async (req, res) => {
     )}`;
 
     const tmpPath = path.join(__dirname, "../../tmp", uniqueFileName);
-    await jimp.read(avatarData).then((image) => {
-      return image.resize(250, 250).write(tmpPath);
-    });
+
+    const image = await jimp.read(avatarData);
+    await image.resize(250, 250).writeAsync(tmpPath);
 
     console.log("Avatar resized successfully");
 
@@ -215,22 +215,16 @@ router.patch("/avatars", auth, upload.single("avatar"), async (req, res) => {
       "../../public/avatars",
       uniqueFileName
     );
-    await jimp
-      .read(tmpPath)
-      .then((image) => {
-        return image.writeAsync(finalPath);
-      })
-      .catch((error) => {
-        console.error("Error writing image:", error);
-        throw error;
-      });
+
+    await jimp.read(tmpPath);
+    await image.writeAsync(finalPath);
+
     console.log("Avatar saved successfully");
 
     currentUser.avatarURL = `/avatars/${uniqueFileName}`;
     await currentUser.save();
 
     res.status(200).json({ avatarURL: currentUser.avatarURL });
-    console.log(avatarURL);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error 2" });
