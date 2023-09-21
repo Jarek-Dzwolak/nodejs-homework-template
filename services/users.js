@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const gravatar = require("gravatar");
 
 const usersSchema = new mongoose.Schema({
   password: {
@@ -10,6 +11,7 @@ const usersSchema = new mongoose.Schema({
     type: String,
     required: [true, "Email is required"],
     unique: true,
+    avatarURL: String,
   },
   subscription: {
     type: String,
@@ -25,6 +27,10 @@ const usersSchema = new mongoose.Schema({
     ref: "User",
   },
 });
+
+usersSchema.methods.generateAvatarUrl = function () {
+  return gravatar.url(this.email, { s: "200", r: "pg", d: "identicon" });
+};
 
 const User = mongoose.model("User", usersSchema);
 

@@ -2,6 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 const passport = require("passport");
+
 const contactsRouter = require("./routes/api/contactsRoute");
 const usersRouter = require("./routes/api/usersRoute");
 const app = express();
@@ -27,5 +28,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });
 });
+app.use(express.static("public"));
 
 module.exports = app;
