@@ -12,7 +12,8 @@ const auth = require("../../auth");
 const { getUser } = require("../../models/users");
 const path = require("path");
 const jimp = require("jimp");
-const { Console } = require("console");
+
+const Mailer = require("../../mailer");
 
 const signupSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -49,13 +50,19 @@ router.post("/signup", async (req, res) => {
       avatarURL: avatarURL,
     });
 
+    const verificationToken = Mailer.generateVerificationToken();
+    user.verificationToken = verificationToken;
+
     await user.save();
+
+    await Mailer.sendVerificationEmail(user.email, verificationToken);
 
     res.status(201).json({
       user: {
         email: user.email,
         subscription: user.subscription,
         avatarURL: user.avatarURL,
+        verificationToken: user.verificationToken,
       },
     });
   } catch (error) {
@@ -83,6 +90,10 @@ router.post("/login", async (req, res) => {
 
     if (!user) {
       return res.status(401).json({ message: "Email or password is wrong" });
+    }
+    
+    if (!user.verify) {
+      return res.status(401).json({ message: "Account not verified" });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
@@ -228,6 +239,66 @@ router.patch("/avatars", auth, upload.single("avatar"), async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error 2" });
+  }
+});
+
+// ///////////////////////////////////////////////////////////////////////
+
+router.get("/verify/:verificationToken", async (req, res) => {
+  try {
+    const verificationToken = req.params.verificationToken;
+
+    const user = await User.findOne({ verificationToken });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.verify = true;
+
+    await user.save();
+
+    user.verificationToken = null;
+
+    res.status(200).json({ message: "Verification successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// /////////////////////////////////////////////////////////
+
+router.post("/verify", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Missing required field email" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.verify) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+
+    const verificationToken = Mailer.generateVerificationToken();
+    user.verificationToken = verificationToken;
+    await user.save();
+
+    await Mailer.sendVerificationEmail(user.email, verificationToken);
+
+    res.status(200).json({ message: "Verification email sent" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
